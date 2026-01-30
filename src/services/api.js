@@ -11,6 +11,7 @@ export async function getMaterials() {
     console.error(error);
     return []; // Devuelve array vacío si falla
   }
+  
 }
 
 export async function getMonsters() {
