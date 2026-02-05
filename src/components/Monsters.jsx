@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import { getMonsters } from "../services/api"; // importa la función del servicio
+import MonsterForm from "./MonsterForm";
+
 
 export default function Monsters() {
     const [monsters, setMonsters] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedMonsters, setSelectedMonsters] = useState(null);
+    // Estado para mostrar el formulario
+    const [isFormOpen, setIsFormOpen] = useState(false);
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -22,12 +26,30 @@ export default function Monsters() {
         fetchMonsters();
     }, []);
 
+    const handleAddMonster = (newMonster) => {
+    setMonsters([...monsters, { ...newMonster, id_num: Date.now() }]);
+    setIsFormOpen(false);
+};
+
+
     if (loading) return <p>Cargando monsters...</p>;
     if (error) return <p>Error: {error}</p>;
 
     return (
         <div className="container mt-4">
             <h2>Lista de monsters</h2>
+            {
+                isFormOpen ? (
+                    <MonsterForm
+                        onSubmit={handleAddMonster}
+                        onCancel={() => setIsFormOpen(false)}
+                    />
+                ) : (
+                    <button className="btn btn-success mb-3" onClick={() => setIsFormOpen(true)}>
+                        Afegir Monster
+                    </button>
+                )
+            }
             <div className="row">
                 {monsters.map((mon) => (
                     <div key={mon.id_num} className=" col-4  mb-3" style={{ width: "18rem" }}>
