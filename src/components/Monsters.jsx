@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getMonsters } from "../services/api"; // importa la función del servicio
 import MonsterForm from "./MonsterForm";
 
@@ -6,9 +6,13 @@ import MonsterForm from "./MonsterForm";
 export default function Monsters() {
     const [monsters, setMonsters] = useState([]);
     const [loading, setLoading] = useState(true);
+    const formRef = useRef(null);
     const [selectedMonsters, setSelectedMonsters] = useState(null);
     // Estado para mostrar el formulario
     const [isFormOpen, setIsFormOpen] = useState(false);
+
+    const [monsterToEdit, setMonsterToEdit] = useState(null);
+
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -26,11 +30,27 @@ export default function Monsters() {
         fetchMonsters();
     }, []);
 
-    const handleAddMonster = (newMonster) => {
-    setMonsters([...monsters, { ...newMonster, id_num: Date.now() }]);
-    setIsFormOpen(false);
-};
+    useEffect(() => {
+        if (isFormOpen && formRef.current) {
+            formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    }, [isFormOpen]);
 
+    const handleSaveMonster = (newData) => {
+        if (monsterToEdit) {
+            // Editar: reemplazamos el material existente
+            setMonsters(monsters.map(mon => mon.id_num === monsterToEdit.id_num ? newData : mon));
+            alert("Monster actualitzat!");
+        } else {
+            // Agregar: le ponemos un id temporal
+            setMonsters([...monsters, { ...newData, id_num: Date.now() }]);
+            alert("Monster afegit!");
+        }
+
+        // Cerrar formulario y limpiar selección
+        setIsFormOpen(false);
+        setMonsterToEdit(null);
+    };
 
     if (loading) return <p>Cargando monsters...</p>;
     if (error) return <p>Error: {error}</p>;
@@ -38,18 +58,25 @@ export default function Monsters() {
     return (
         <div className="container mt-4">
             <h2>Lista de monsters</h2>
-            {
-                isFormOpen ? (
+            {isFormOpen && (
+                <div ref={formRef}>
                     <MonsterForm
-                        onSubmit={handleAddMonster}
-                        onCancel={() => setIsFormOpen(false)}
+                        initialData={monsterToEdit}  // <-- si es edición, aquí llegan los datos
+                        onSubmit={handleSaveMonster} // función para guardar
+                        onCancel={() => {
+                            setIsFormOpen(false);
+                            setMonsterToEdit(null);
+                        }}
                     />
-                ) : (
-                    <button className="btn btn-success mb-3" onClick={() => setIsFormOpen(true)}>
-                        Afegir Monster
-                    </button>
-                )
-            }
+                </div>
+            )}
+
+            {!isFormOpen && (
+                <button className="btn btn-success mb-3" onClick={() => setIsFormOpen(true)}>
+                    Afegir Monster
+                </button>
+            )}
+
             <div className="row">
                 {monsters.map((mon) => (
                     <div key={mon.id_num} className=" col-4  mb-3" style={{ width: "18rem" }}>
@@ -86,7 +113,17 @@ export default function Monsters() {
                             ))}</p>
 
                             <div className="mt-3  d-flex justify-content-center">
-                                <button className="btn btn-primary ms-4">Editar</button>
+                                <button
+                                    className="btn btn-primary ms-4"
+                                    onClick={() => {
+                                        setMonsterToEdit(selectedMonsters); // le decimos qué monster editar
+                                        setIsFormOpen(true);                 // abrimos el formulario
+                                        setSelectedMonsters(null);           // opcional: cerrar el modal
+                                    }}
+                                >
+                                    Editar
+                                </button>
+
                                 <button className="btn btn-danger ms-4">Eliminar</button>
                                 <button className="btn btn-secondary ms-4" onClick={() => setSelectedMonsters(null)}>Cerrar</button>
                             </div>
