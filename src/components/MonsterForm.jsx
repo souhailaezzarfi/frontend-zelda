@@ -56,7 +56,7 @@ export default function MonsterForm({ initialData = null, onSubmit, onCancel }) 
 
     return (
         <div className="container mt-4">
-            <h3>{initialData ? "Editar Material" : "Afegir Material"}</h3>
+            <h3>{initialData ? "Editar Monster" : "Afegir Monster"}</h3>
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label>Nom</label>
@@ -96,8 +96,8 @@ export default function MonsterForm({ initialData = null, onSubmit, onCancel }) 
   
 
                 <div className="d-flex justify-content-between">
-                    <button type="submit" className="btn btn-primary">Guardar</button>
-                    <button type="button" className="btn btn-secondary" onClick={onCancel}> Cancelar </button>
+                    <button type="submit" className="btn btn-primary mb-3">Guardar</button>
+                    <button type="button" className="btn btn-secondary mb-3" onClick={onCancel}> cancel·lar </button>
                 </div>
             </form>
         </div>
