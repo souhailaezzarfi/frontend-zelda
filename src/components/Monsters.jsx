@@ -13,6 +13,8 @@ export default function Monsters() {
 
     const [monsterToEdit, setMonsterToEdit] = useState(null);
 
+    const [search, setSearch] = useState("");
+
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -38,7 +40,7 @@ export default function Monsters() {
 
     const handleSaveMonster = (newData) => {
         if (monsterToEdit) {
-            // Editar: reemplazamos el material existente
+            // Editar: reemplazamos el monerial existente
             setMonsters(monsters.map(mon => mon.id_num === monsterToEdit.id_num ? newData : mon));
             alert("Monster actualitzat!");
         } else {
@@ -65,12 +67,23 @@ export default function Monsters() {
         }
     }
 
+    const filteredMonsters = monsters.filter((mon) =>
+        mon.name.toLowerCase().includes(search.toLowerCase())
+    );
+
     if (loading) return <p>Cargando monsters...</p>;
     if (error) return <p>Error: {error}</p>;
 
     return (
         <div className="container mt-4">
             <h2>Lista de monsters</h2>
+            <input
+                type="text"
+                className="form-control mb-3" style={{ width: "400px" }}
+                placeholder="Cerca monster per nom..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+            />
             {isFormOpen && (
                 <div ref={formRef}>
                     <MonsterForm
@@ -91,7 +104,7 @@ export default function Monsters() {
             )}
 
             <div className="row">
-                {monsters.map((mon) => (
+                 {filteredMonsters.map((mon) => (
                     <div key={mon.id_num} className=" col-4  mb-3" style={{ width: "18rem" }}>
                         <div className="card"
                             onClick={() => setSelectedMonsters(mon)} style={{ cursor: "pointer" }}>

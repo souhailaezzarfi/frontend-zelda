@@ -16,6 +16,9 @@ export default function Materials() {
     //estado para el material seleccionado para editar (modal)
     const [materialToEdit, setMaterialToEdit] = useState(null);
 
+    const [search, setSearch] = useState("");
+
+
 
     useEffect(() => {
         async function fetchMaterials() {
@@ -69,13 +72,27 @@ export default function Materials() {
         }
     }
 
+    const filteredMaterials = materials.filter((mat) =>
+        mat.name.toLowerCase().includes(search.toLowerCase())
+    );
+
+
 
     if (loading) return <p>Cargando materiales...</p>;
     if (error) return <p>Error: {error}</p>;
 
     return (
+
         <div className="container mt-4">
             <h2>Lista de materiales</h2>
+            <input
+                type="text"
+                className="form-control mb-3" style={{ width: "400px" }}
+                placeholder="Cerca material per nom..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+            />
+
             {isFormOpen && (
                 <div ref={formRef}>
                     <MaterialForm
@@ -96,7 +113,7 @@ export default function Materials() {
             )}
 
             <div className="row">
-                {materials.map((mat) => (
+                {filteredMaterials.map((mat) => (
                     <div key={mat.id_num} className=" col-4  mb-3" style={{ width: "18rem" }}>
                         <div className="card"
                             onClick={() => setSelectedMaterial(mat)} style={{ cursor: "pointer" }}>
