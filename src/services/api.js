@@ -25,3 +25,27 @@ export async function getMonsters() {
     return []; // Devuelve array vacío si falla
   }
 }
+
+export async function deleteMaterial(id) {
+    const response = await fetch(`http://localhost:3001/materials/${id}`, {
+        method: "DELETE",
+    });
+
+    if (!response.ok) {
+        throw new Error("Error al eliminar el material");
+    }
+
+    return true;
+}
+
+export async function deleteMonster(id) {
+    const response = await fetch(`http://localhost:3001/monsters/${id}`, {
+        method: "DELETE",
+    });
+
+    if (!response.ok) {
+        throw new Error("Error al eliminar el monster");
+    }
+
+    return true;
+}
