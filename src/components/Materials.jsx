@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { getMaterials } from "../services/api"; // importa la función del servicio
+import { getMaterials, deleteMaterial } from "../services/api"; // importa la función del servicio
 import MaterialForm from "./MaterialForm";
 
 
@@ -55,6 +55,20 @@ export default function Materials() {
         setIsFormOpen(false);
         setMaterialToEdit(null);
     };
+
+    async function handleDeleteMaterial(id_num) {
+        if (!window.confirm("Segur que vols eliminar aquest material?")) return;
+
+        try {
+            await deleteMaterial(id_num); // DELETE a /materials/:id_num
+            setMaterials(materials.filter(mat => mat.id_num !== id_num)); // actualizar lista
+            setSelectedMaterial(null);
+            alert("Material eliminat correctament!");
+        } catch (err) {
+            alert("Error en eliminar: " + err.message);
+        }
+    }
+
 
     if (loading) return <p>Cargando materiales...</p>;
     if (error) return <p>Error: {error}</p>;
@@ -128,7 +142,13 @@ export default function Materials() {
                                     Editar
                                 </button>
 
-                                <button className="btn btn-danger ms-4">Eliminar</button>
+                                <button
+                                    className="btn btn-danger ms-4"
+                                    onClick={() => handleDeleteMaterial(selectedMaterial.id_num)}
+                                >
+                                    Eliminar
+                                </button>
+
                                 <button className="btn btn-secondary ms-4" onClick={() => setSelectedMaterial(null)}>Cerrar</button>
                             </div>
                         </div>

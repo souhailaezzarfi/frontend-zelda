@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { getMonsters } from "../services/api"; // importa la función del servicio
+import { getMonsters, deleteMonster } from "../services/api"; // importa la función del servicio
 import MonsterForm from "./MonsterForm";
 
 
@@ -7,7 +7,7 @@ export default function Monsters() {
     const [monsters, setMonsters] = useState([]);
     const [loading, setLoading] = useState(true);
     const formRef = useRef(null);
-    const [selectedMonsters, setSelectedMonsters] = useState(null);
+    const [selectedMonster, setSelectedMonsters] = useState(null);
     // Estado para mostrar el formulario
     const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -51,6 +51,19 @@ export default function Monsters() {
         setIsFormOpen(false);
         setMonsterToEdit(null);
     };
+
+    async function handleDeleteMonster(id_num) {
+        if (!window.confirm("Segur que vols eliminar aquest monster?")) return;
+
+        try {
+            await deleteMonster(id_num);
+            setMonsters(monsters.filter(mon => mon.id_num !== id_num)); // actualizar lista
+            setSelectedMonsters(null);
+            alert("Monster eliminat correctament!");
+        } catch (err) {
+            alert("Error en eliminar: " + err.message);
+        }
+    }
 
     if (loading) return <p>Cargando monsters...</p>;
     if (error) return <p>Error: {error}</p>;
@@ -97,18 +110,18 @@ export default function Monsters() {
             </div>
 
             {
-                selectedMonsters && (
+                selectedMonster && (
                     <div className="modal-backdrop" style={backdropStyle}>
                         <div className="modal-content p-3" style={modalStyle}>
-                            <div><img src={selectedMonsters.image} alt="" width="100%" height="100%" /> </div>
-                            <h3>{selectedMonsters.name}</h3>
-                            <p>Categoría: {selectedMonsters.category}</p>
-                            <p>Ubicaciones: {selectedMonsters.common_locations.map((loc, index) => (
+                            <div><img src={selectedMonster.image} alt="" width="100%" height="100%" /> </div>
+                            <h3>{selectedMonster.name}</h3>
+                            <p>Categoría: {selectedMonster.category}</p>
+                            <p>Ubicaciones: {selectedMonster.common_locations.map((loc, index) => (
                                 <span key={index}>{loc}<br /></span>
                             ))}
                             </p>
-                            <p>Descripció: {selectedMonsters.description}</p>
-                            <p>Drops: {selectedMonsters.drops.map((loc, index) => (
+                            <p>Descripció: {selectedMonster.description}</p>
+                            <p>Drops: {selectedMonster.drops.map((loc, index) => (
                                 <span key={index}>{loc}<br /></span>
                             ))}</p>
 
@@ -116,7 +129,7 @@ export default function Monsters() {
                                 <button
                                     className="btn btn-primary ms-4"
                                     onClick={() => {
-                                        setMonsterToEdit(selectedMonsters); // le decimos qué monster editar
+                                        setMonsterToEdit(selectedMonster); // le decimos qué monster editar
                                         setIsFormOpen(true);                 // abrimos el formulario
                                         setSelectedMonsters(null);           // opcional: cerrar el modal
                                     }}
@@ -124,7 +137,12 @@ export default function Monsters() {
                                     Editar
                                 </button>
 
-                                <button className="btn btn-danger ms-4">Eliminar</button>
+                                <button
+                                    className="btn btn-danger ms-4"
+                                    onClick={() => handleDeleteMonster(selectedMonster.id_num)}
+                                >
+                                    Eliminar
+                                </button>
                                 <button className="btn btn-secondary ms-4" onClick={() => setSelectedMonsters(null)}>Cerrar</button>
                             </div>
 
